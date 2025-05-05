@@ -1,0 +1,50 @@
+<div class="book-details-container">
+    <div class="book-details">
+        <div class="book-image-large">
+            <img src="<%= book.imageUrl %>" alt="<%= book.title %>">
+        </div>
+        <div class="book-info-detailed">
+            <h1><%= book.title %></h1>
+            <h2 class="author">Автор: <%= book.author %></h2>
+            <p class="description"><%= book.description %></p>
+            <div class="price-stock">
+                <p class="price"><%= book.price %> грн</p>
+                <p class="stock">В наявності: <%= book.inStock %></p>
+            </div>
+            <div class="actions">
+                <% if (locals.user) { %>
+                    <button onclick="addToCart('<%= book._id %>')" class="add-to-cart-large">В кошик</button>
+                <% } else { %>
+                    <a href="/login" class="add-to-cart-large">Увійти щоб купити</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addToCart(bookId) {
+    fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            bookId: bookId,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Книгу додано до кошика');
+        } else {
+            alert(data.message || 'Помилка при додаванні до кошика');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Помилка при додаванні до кошика');
+    });
+}
+</script>

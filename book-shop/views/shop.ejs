@@ -1,0 +1,80 @@
+<div class="shop-container">
+    <h1>Книжковий магазин</h1>
+    
+    <div class="shop-controls">
+        <form class="search-form" action="/shop" method="GET">
+            <div class="search-box">
+                <input type="text" 
+                       name="search" 
+                       placeholder="Пошук за назвою, автором..." 
+                       value="<%= locals.currentSearch || '' %>">
+                <button type="submit">Пошук</button>
+            </div>
+            
+            <div class="sort-box">
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="date_desc" <%= locals.currentSort === 'date_desc' ? 'selected' : '' %>>Найновіші</option>
+                    <option value="title_asc" <%= locals.currentSort === 'title_asc' ? 'selected' : '' %>>За назвою (А-Я)</option>
+                    <option value="title_desc" <%= locals.currentSort === 'title_desc' ? 'selected' : '' %>>За назвою (Я-А)</option>
+                    <option value="price_asc" <%= locals.currentSort === 'price_asc' ? 'selected' : '' %>>Ціна (від найнижчої)</option>
+                    <option value="price_desc" <%= locals.currentSort === 'price_desc' ? 'selected' : '' %>>Ціна (від найвищої)</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <div class="books-grid">
+        <% if (books && books.length > 0) { %>
+            <% books.forEach(book => { %>
+                <div class="book-card">
+                    <div class="book-image">
+                        <img src="<%= book.imageUrl %>" alt="<%= book.title %>">
+                    </div>
+                    <div class="book-info">
+                        <h3><%= book.title %></h3>
+                        <p class="author">Автор: <%= book.author %></p>
+                        <p class="price"><%= book.price %> грн</p>
+                        <p class="stock">В наявності: <%= book.inStock %></p>
+                        <div class="book-actions">
+                            <a href="/books/<%= book._id %>" class="view-details">Детальніше</a>
+                            <% if (locals.user) { %>
+                                <button onclick="addToCart('<%= book._id %>')" class="add-to-cart">В кошик</button>
+                            <% } else { %>
+                                <a href="/login" class="add-to-cart">Увійти щоб купити</a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p class="no-books">Книги не знайдено</p>
+        <% } %>
+    </div>
+</div>
+
+<script>
+function addToCart(bookId) {
+    fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            bookId: bookId,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Книгу додано до кошика');
+        } else {
+            alert(data.message || 'Помилка при додаванні до кошика');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Помилка при додаванні до кошика');
+    });
+}
+</script>

@@ -1,0 +1,39 @@
+<div class="cart-container">
+    <h1>Кошик</h1>
+    <% if (cart.items && cart.items.length > 0) { %>
+        <div class="cart-items">
+            <% let total = 0 %>
+            <% cart.items.forEach(item => { %>
+                <% total += item.book.price * item.quantity %>
+                <div class="cart-item">
+                    <div class="cart-item-image">
+                        <img src="<%= item.book.imageUrl %>" alt="<%= item.book.title %>">
+                    </div>
+                    <div class="cart-item-info">
+                        <h3><%= item.book.title %></h3>
+                        <p class="author">Автор: <%= item.book.author %></p>
+                        <p class="price"><%= item.book.price %> грн</p>
+                        <div class="quantity-control">
+                            <button class="quantity-btn decrease" data-book-id="<%= item.book._id %>">-</button>
+                            <input type="number" value="<%= item.quantity %>" min="1" max="<%= item.book.inStock %>" 
+                                   class="quantity-input" data-book-id="<%= item.book._id %>">
+                            <button class="quantity-btn increase" data-book-id="<%= item.book._id %>">+</button>
+                        </div>
+                        <form action="/cart/remove/<%= item.book._id %>" method="POST" class="remove-form">
+                            <button type="submit" class="remove-btn">Видалити</button>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+            <div class="cart-summary">
+                <h3>Разом до сплати: <span class="total-price"><%= total %> грн</span></h3>
+                <button class="checkout-btn">Оформити замовлення</button>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="empty-cart">
+            <p>Ваш кошик порожній</p>
+            <a href="/shop" class="continue-shopping">Перейти до магазину</a>
+        </div>
+    <% } %>
+</div>

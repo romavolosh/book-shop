@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Книжковий магазин</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">BookShop</a>
+            <ul class="nav-links">
+                <li><a href="/shop">Магазин</a></li>
+                <% if (locals.user) { %>
+                    <li><a href="/profile">Профіль</a></li>
+                    <li><a href="/cart" class="cart-link"><i class="fas fa-shopping-cart"></i> Кошик</a></li>
+                <% } else { %>
+                    <li><a href="/login">Вхід</a></li>
+                <% } %>
+                <li><a href="/discounts">Знижки</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <% if (locals.success && success.length > 0) { %>
+        <div class="flash-message success">
+            <%= success %>
+        </div>
+    <% } %>
+
+    <% if (locals.error && error.length > 0) { %>
+        <div class="flash-message error">
+            <%= error %>
+        </div>
+    <% } %>
+
+    <main class="container">
+        <%- body %>
+    </main>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/cart.js"></script>
+</body>
+</html>

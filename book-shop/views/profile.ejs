@@ -1,0 +1,68 @@
+<div class="profile-container">
+    <h1>Особистий кабінет</h1>
+    <div class="profile-content">
+        <div class="profile-info">
+            <h2>Інформація про користувача</h2>
+            <% if (user) { %>
+                <div class="user-details">
+                    <p><strong>Ім'я:</strong> <%= user.name %></p>
+                    <p><strong>Email:</strong> <%= user.email %></p>
+                    <p><strong>Дата реєстрації:</strong> <%= new Date(user.createdAt).toLocaleDateString() %></p>
+                    <p><strong>Роль:</strong> <%= user.role === 'admin' ? 'Адміністратор' : 'Користувач' %></p>
+                </div>
+                <a href="/logout" class="logout-button">Вийти</a>
+            <% } else { %>
+                <p>Будь ласка, <a href="/login">увійдіть у систему</a></p>
+            <% } %>
+        </div>
+
+        <% if (user && user.role === 'admin') { %>
+        <div class="admin-panel">
+            <h2>Панель адміністратора</h2>
+            <div class="add-book-form">
+                <h3>Додати нову книгу</h3>
+                <form action="/books" method="POST">
+                    <div class="form-group">
+                        <label for="title">Назва книги:</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Автор:</label>
+                        <input type="text" id="author" name="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Опис:</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Ціна:</label>
+                        <input type="number" id="price" name="price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Категорія:</label>
+                        <input type="text" id="category" name="category" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inStock">Кількість в наявності:</label>
+                        <input type="number" id="inStock" name="inStock" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageUrl">URL зображення:</label>
+                        <input type="text" id="imageUrl" name="imageUrl" required>
+                    </div>
+                    <button type="submit" class="add-book-button">Додати книгу</button>
+                </form>
+            </div>
+        </div>
+        <% } %>
+
+        <div class="order-history">
+            <h2>Історія замовлень</h2>
+            <% if (user) { %>
+                <p>Історія замовлень порожня</p>
+            <% } else { %>
+                <p>Увійдіть, щоб побачити історію замовлень</p>
+            <% } %>
+        </div>
+    </div>
+</div>
