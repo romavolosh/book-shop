@@ -16,6 +16,39 @@
             <% } %>
         </div>
 
+        <div class="order-history">
+            <h2>Останні замовлення</h2>
+            <% if (locals.orders && orders.length > 0) { %>
+                <% orders.slice(0, 3).forEach(order => { %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <h3>Замовлення #<%= order._id %></h3>
+                                <small><%= new Date(order.createdAt).toLocaleString() %></small>
+                            </div>
+                            <div class="order-status <%= order.status %>">
+                                <%= {
+                                    'pending': 'Очікує обробки',
+                                    'processing': 'Обробляється',
+                                    'shipped': 'Відправлено',
+                                    'delivered': 'Доставлено'
+                                }[order.status] %>
+                            </div>
+                        </div>
+                        <div class="order-footer">
+                            <div class="order-total">
+                                Загальна сума: <%= order.totalAmount %> грн
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+                <a href="/orders/history" class="view-all-orders">Переглянути всі замовлення</a>
+            <% } else { %>
+                <p>У вас ще немає замовлень</p>
+                <a href="/shop" class="continue-shopping">Перейти до магазину</a>
+            <% } %>
+        </div>
+
         <% if (user && user.role === 'admin') { %>
         <div class="admin-panel">
             <h2>Панель адміністратора</h2>
@@ -55,14 +88,5 @@
             </div>
         </div>
         <% } %>
-
-        <div class="order-history">
-            <h2>Історія замовлень</h2>
-            <% if (user) { %>
-                <p>Історія замовлень порожня</p>
-            <% } else { %>
-                <p>Увійдіть, щоб побачити історію замовлень</p>
-            <% } %>
-        </div>
     </div>
 </div>

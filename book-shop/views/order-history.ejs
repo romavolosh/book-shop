@@ -1,0 +1,62 @@
+<div class="order-history-container">
+    <h1>Історія замовлень</h1>
+    
+    <% if (orders && orders.length > 0) { %>
+        <% orders.forEach(order => { %>
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <h3>Замовлення #<%= order._id %></h3>
+                        <small><%= new Date(order.createdAt).toLocaleString() %></small>
+                    </div>
+                    <div class="order-status <%= order.status %>">
+                        <%= {
+                            'pending': 'Очікує обробки',
+                            'processing': 'Обробляється',
+                            'shipped': 'Відправлено',
+                            'delivered': 'Доставлено'
+                        }[order.status] %>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <% order.items.forEach(item => { %>
+                        <div class="order-item">
+                            <div class="order-item-image">
+                                <img src="<%= item.book.imageUrl %>" alt="<%= item.book.title %>">
+                            </div>
+                            <div class="order-item-details">
+                                <h4><%= item.book.title %></h4>
+                                <p>Автор: <%= item.book.author %></p>
+                                <p>Кількість: <%= item.quantity %></p>
+                            </div>
+                            <div class="order-item-price">
+                                <%= item.price * item.quantity %> грн
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <div class="delivery-info">
+                    <h4>Інформація про доставку</h4>
+                    <p>Отримувач: <%= order.delivery.fullName %></p>
+                    <p>Телефон: <%= order.delivery.phone %></p>
+                    <p>Місто: <%= order.delivery.city %></p>
+                    <p>Адреса: <%= order.delivery.address %></p>
+                    <p>Поштовий індекс: <%= order.delivery.postCode %></p>
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total">
+                        Загальна сума: <%= order.totalAmount %> грн
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <div class="empty-cart">
+            <p>У вас ще немає замовлень</p>
+            <a href="/shop" class="continue-shopping">Перейти до магазину</a>
+        </div>
+    <% } %>
+</div>
