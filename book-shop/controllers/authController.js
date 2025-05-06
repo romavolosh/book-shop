@@ -6,13 +6,12 @@ exports.register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Перевіряємо, чи існує користувач
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Користувач з такою електронною поштою вже існує' });
+            req.flash('error', 'Користувач з такою електронною поштою вже існує');
+            return res.redirect('/register');
         }
 
-        // Створюємо нового користувача
         const user = new User({
             name,
             email,
@@ -21,22 +20,23 @@ exports.register = async (req, res) => {
 
         await user.save();
 
-        // Створюємо токен
         const token = jwt.sign(
             { userId: user._id },
             process.env.SESSION_SECRET,
-            { expiresIn: '30d' }  // Збільшуємо до 30 днів
+            { expiresIn: '30d' }
         );
 
         res.cookie('token', token, {
             httpOnly: true,
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
-            sameSite: 'strict'
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+            sameSite: 'lax'
         });
 
         res.redirect('/profile');
     } catch (error) {
-        res.status(500).json({ message: 'Помилка при реєстрації користувача' });
+        console.error('Помилка при реєстрації:', error);
+        req.flash('error', 'Помилка при реєстрації користувача');
+        res.redirect('/register');
     }
 };
 
@@ -44,40 +44,45 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Знаходимо користувача
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: 'Користувача не знайдено' });
+            req.flash('error', 'Користувача не знайдено');
+            return res.redirect('/login');
         }
 
-        // Перевіряємо пароль
         const isValidPassword = await user.comparePassword(password);
         if (!isValidPassword) {
-            return res.status(400).json({ message: 'Невірний пароль' });
+            req.flash('error', 'Невірний пароль');
+            return res.redirect('/login');
         }
 
-        // Створюємо токен
         const token = jwt.sign(
             { userId: user._id },
             process.env.SESSION_SECRET,
-            { expiresIn: '30d' }  // Збільшуємо до 30 днів
+            { expiresIn: '30d' }
         );
 
         res.cookie('token', token, {
             httpOnly: true,
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
-            sameSite: 'strict'
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+            sameSite: 'lax'
         });
 
         res.redirect('/profile');
     } catch (error) {
-        res.status(500).json({ message: 'Помилка при вході в систему' });
+        console.error('Помилка при вході:', error);
+        req.flash('error', 'Помилка при вході в систему');
+        res.redirect('/login');
     }
 };
 
 exports.logout = (req, res) => {
-    res.clearCookie('token');
-    res.redirect('/');
+    req.logout(() => {
+        res.clearCookie('token');
+        req.session.destroy(() => {
+            res.redirect('/');
+        });
+    });
 };
 
 exports.getRegisterPage = (req, res) => {
@@ -101,21 +106,43 @@ exports.googleAuth = passport.authenticate('google', {
 
 exports.googleCallback = (req, res, next) => {
     passport.authenticate('google', async (err, user) => {
-        if (err) return next(err);
-        if (!user) return res.redirect('/login');
+        try {
+            if (err) {
+                console.error('Google auth error:', err);
+                req.flash('error', 'Помилка при вході через Google');
+                return res.redirect('/login');
+            }
+            
+            if (!user) {
+                req.flash('error', 'Не вдалося отримати дані користувача від Google');
+                return res.redirect('/login');
+            }
 
-        const token = jwt.sign(
-            { userId: user._id },
-            process.env.SESSION_SECRET,
-            { expiresIn: '30d' }  // Збільшуємо до 30 днів
-        );
+            req.login(user, async (loginErr) => {
+                if (loginErr) {
+                    console.error('Login error:', loginErr);
+                    req.flash('error', 'Помилка при вході в систему');
+                    return res.redirect('/login');
+                }
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
-            sameSite: 'strict'
-        });
+                const token = jwt.sign(
+                    { userId: user._id },
+                    process.env.SESSION_SECRET,
+                    { expiresIn: '30d' }
+                );
 
-        res.redirect('/profile');
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    maxAge: 30 * 24 * 60 * 60 * 1000,
+                    sameSite: 'lax'
+                });
+
+                return res.redirect('/profile');
+            });
+        } catch (error) {
+            console.error('Google callback error:', error);
+            req.flash('error', 'Помилка при обробці входу через Google');
+            res.redirect('/login');
+        }
     })(req, res, next);
 };

@@ -43,15 +43,7 @@ router.get('/orders/history', protect, orderController.getOrderHistory);
 router.post('/books', protect, isAdmin, bookController.addBook);
 
 // Аутентифікація через Google
-router.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-);
-
-router.get('/auth/google/callback',
-    passport.authenticate('google', { 
-        failureRedirect: '/login',
-        successRedirect: '/profile'
-    })
-);
+router.get('/auth/google', authController.googleAuth);
+router.get('/auth/google/callback', authController.googleCallback);
 
 module.exports = router;

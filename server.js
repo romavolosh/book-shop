@@ -41,6 +41,13 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Додаємо глобальні змінні для passport
+app.use((req, res, next) => {
+    res.locals.user = req.user;
+    res.locals.isAuthenticated = req.isAuthenticated();
+    next();
+});
+
 // View Engine
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
