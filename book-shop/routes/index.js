@@ -5,20 +5,16 @@ const bookController = require('../controllers/bookController');
 const authController = require('../controllers/authController');
 const cartController = require('../controllers/cartController');
 const orderController = require('../controllers/orderController');
+const postController = require('../controllers/postController');
 const { protect, isAdmin } = require('../middleware/auth');
 
-// Публічні маршрути
-router.get('/', (req, res) => {
-    res.render('index', { title: 'Книжковий магазин' });
-});
+// Публічні маршрути (з protect для підтримки сесії)
+router.get('/', protect, postController.getAllPosts);
 
-router.get('/shop', bookController.getAllBooks);
-router.get('/books/:id', bookController.getBookById);
-router.get('/discounts', (req, res) => {
-    res.render('discounts', { title: 'Знижки' });
-});
+router.get('/shop', protect, bookController.getAllBooks);
+router.get('/books/:id', protect, bookController.getBookById);
 
-// Маршрути автентифікації
+// Маршрути автентифікації не потребують protect
 router.get('/login', authController.getLoginPage);
 router.post('/login', authController.login);
 router.get('/register', authController.getRegisterPage);

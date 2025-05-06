@@ -74,7 +74,8 @@ exports.getOrderHistory = async (req, res) => {
 
         res.render('order-history', {
             title: 'Історія замовлень',
-            orders
+            orders,
+            user: req.user
         });
     } catch (error) {
         console.error('Помилка при отриманні історії замовлень:', error);

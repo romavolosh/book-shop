@@ -12,7 +12,8 @@ exports.getCart = async (req, res) => {
 
         res.render('cart', { 
             title: 'Кошик',
-            cart
+            cart,
+            user: req.user
         });
     } catch (error) {
         req.flash('error', 'Помилка при отриманні кошика');

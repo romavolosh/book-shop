@@ -81,11 +81,17 @@ exports.logout = (req, res) => {
 };
 
 exports.getRegisterPage = (req, res) => {
-    res.render('register', { title: 'Реєстрація' });
+    res.render('register', { 
+        title: 'Реєстрація',
+        user: req.user 
+    });
 };
 
 exports.getLoginPage = (req, res) => {
-    res.render('login', { title: 'Вхід' });
+    res.render('login', { 
+        title: 'Вхід',
+        user: req.user 
+    });
 };
 
 // Google автентифікація

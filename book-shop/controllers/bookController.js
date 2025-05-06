@@ -44,12 +44,13 @@ exports.getAllBooks = async (req, res) => {
 
         const books = await Book.find(query).sort(sortOption);
         
+        // Передаємо user з req.user, а не очікуємо його з res.locals
         res.render('shop', { 
             title: 'Книжковий магазин',
             books,
             currentSearch: search || '',
             currentSort: sort || 'date_desc',
-            user: req.user // Явно передаємо користувача в шаблон
+            user: req.user
         });
     } catch (error) {
         console.error('Помилка при отриманні книг:', error);
